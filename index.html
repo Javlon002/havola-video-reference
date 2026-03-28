@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Havola — Video Storyboard: Zero-Config Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', sans-serif; background: #F9FAFB; color: #111827; -webkit-font-smoothing: antialiased; }
+
+  .nav { position: sticky; top: 0; z-index: 100; background: #060608; padding: 14px 48px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.06); }
+  .nav-logo { font-size: 15px; font-weight: 600; color: rgba(255,255,255,0.85); }
+  .nav-badge { font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(255,255,255,0.50); background: rgba(255,255,255,0.08); padding: 4px 10px; border-radius: 999px; }
+
+  .hero { background: #060608; padding: 64px 48px 48px; text-align: center; }
+  .hero-eyebrow { font-size: 11px; font-weight: 400; letter-spacing: 3px; text-transform: uppercase; color: rgba(255,255,255,0.20); margin-bottom: 16px; }
+  .hero h1 { font-size: 36px; font-weight: 300; color: #fff; letter-spacing: -0.02em; line-height: 48px; }
+  .hero h1 em { font-weight: 300; font-style: italic; color: rgba(255,255,255,0.30); }
+  .hero p { font-size: 14px; color: rgba(255,255,255,0.30); margin-top: 12px; }
+
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 48px; }
+
+  /* SCENE ROW */
+  .scene-row { padding: 64px 0; border-bottom: 1px solid #E5E7EB; display: flex; gap: 48px; align-items: flex-start; }
+  .scene-row:last-child { border-bottom: none; }
+  .scene-row.reverse { flex-direction: row-reverse; }
+
+  /* PHONE FRAME */
+  .phone-wrap { flex-shrink: 0; position: relative; }
+  .phone { width: 270px; height: 480px; border-radius: 24px; overflow: hidden; position: relative; box-shadow: 0 8px 40px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.06); }
+  .phone-notch { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 100px; height: 20px; background: #000; border-radius: 0 0 16px 16px; z-index: 10; }
+
+  /* SCENE INFO */
+  .scene-info { flex: 1; padding-top: 8px; }
+  .scene-num-label { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .scene-num-circle { width: 32px; height: 32px; background: #060608; color: #fff; font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 600; border-radius: 999px; display: flex; align-items: center; justify-content: center; }
+  .scene-num-circle.key { background: #0065F4; }
+  .scene-type-tag { font-size: 10px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; padding: 3px 10px; border-radius: 999px; }
+  .t-screen { background: #EFF6FF; color: #1D4ED8; }
+  .t-text { background: #F3F4F6; color: #6B7280; }
+  .t-brand { background: #060608; color: rgba(255,255,255,0.60); }
+  .t-overlay { background: #F0FDF4; color: #166534; }
+  .scene-time { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #9CA3AF; }
+
+  .scene-title { font-size: 20px; font-weight: 600; letter-spacing: -0.003em; margin-bottom: 8px; }
+  .scene-desc { font-size: 14px; color: #6B7280; line-height: 24px; margin-bottom: 16px; }
+  .scene-desc strong { color: #111827; }
+
+  .vo-box { background: #060608; border-radius: 8px; padding: 14px 18px; font-size: 13px; font-weight: 300; color: rgba(255,255,255,0.55); line-height: 22px; font-style: italic; }
+  .vo-label { font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #9CA3AF; margin-bottom: 6px; font-style: normal; }
+
+  .key-box { background: #EFF6FF; border-left: 3px solid #0065F4; border-radius: 6px; padding: 12px 16px; font-size: 13px; color: #1D4ED8; line-height: 22px; margin-bottom: 16px; }
+
+  /* ============================== */
+  /* PHONE SCREEN CONTENTS          */
+  /* ============================== */
+
+  /* Scene 1 — Hook */
+  .s1-screen { background: #060608; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; text-align: center; position: relative; }
+  .s1-screen .accent-line { position: absolute; left: 22px; top: 0; bottom: 0; width: 1px; background: rgba(255,255,255,0.03); }
+  .s1-screen .h-line1 { font-size: 22px; font-weight: 300; color: #fff; line-height: 30px; }
+  .s1-screen .h-line2 { font-size: 22px; font-weight: 300; font-style: italic; color: rgba(255,255,255,0.30); line-height: 30px; margin-top: 4px; }
+  .s1-screen .watermark { position: absolute; bottom: 20px; font-size: 10px; font-weight: 500; color: rgba(255,255,255,0.08); letter-spacing: 0.02em; }
+
+  /* Scene 2 — GTM */
+  .s2-screen { background: #fff; width: 100%; height: 100%; display: flex; flex-direction: column; font-size: 9px; color: #333; overflow: hidden; }
+  .s2-toolbar { background: #1a73e8; padding: 8px 12px; color: #fff; font-size: 10px; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
+  .s2-toolbar span { opacity: 0.7; font-weight: 400; font-size: 8px; }
+  .s2-tabs { display: flex; background: #f1f3f4; border-bottom: 1px solid #dadce0; }
+  .s2-tab { padding: 6px 10px; font-size: 8px; color: #5f6368; border-bottom: 2px solid transparent; }
+  .s2-tab.active { color: #1a73e8; border-bottom-color: #1a73e8; font-weight: 600; }
+  .s2-table { flex: 1; padding: 8px; }
+  .s2-row { display: flex; justify-content: space-between; padding: 6px 4px; border-bottom: 1px solid #f1f3f4; font-size: 8px; color: #5f6368; }
+  .s2-row .name { color: #1a73e8; font-weight: 500; }
+  .s2-row .type { background: #e8f0fe; color: #1a73e8; padding: 1px 6px; border-radius: 3px; font-size: 7px; }
+  .s2-highlight { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.75); color: #fff; font-size: 11px; font-weight: 500; padding: 6px 14px; border-radius: 6px; z-index: 5; }
+
+  /* Scene 2b — UTM */
+  .s2b-screen { background: #fff; width: 100%; height: 100%; padding: 16px; display: flex; flex-direction: column; gap: 8px; }
+  .s2b-title { font-size: 11px; font-weight: 600; color: #111; margin-bottom: 4px; }
+  .s2b-field { display: flex; flex-direction: column; gap: 3px; }
+  .s2b-label { font-size: 7px; font-weight: 600; color: #6B7280; text-transform: uppercase; letter-spacing: 0.5px; }
+  .s2b-input { background: #F3F4F6; border: 1px solid #E5E7EB; border-radius: 4px; padding: 6px 8px; font-size: 9px; color: #111; font-family: 'JetBrains Mono', monospace; }
+  .s2b-result { background: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 4px; padding: 8px; font-family: 'JetBrains Mono', monospace; font-size: 7px; color: #6B7280; word-break: break-all; margin-top: 4px; line-height: 1.5; }
+
+  /* Scene 2c — GA4 zero */
+  .s2c-screen { background: #fff; width: 100%; height: 100%; display: flex; flex-direction: column; overflow: hidden; }
+  .s2c-nav { background: #fff; border-bottom: 1px solid #e0e0e0; padding: 8px 12px; display: flex; align-items: center; gap: 8px; }
+  .s2c-nav-icon { width: 20px; height: 20px; background: #f9ab00; border-radius: 4px; }
+  .s2c-nav-text { font-size: 9px; font-weight: 600; color: #202124; }
+  .s2c-sidebar { position: absolute; left: 0; top: 36px; bottom: 0; width: 40px; background: #f8f9fa; border-right: 1px solid #e0e0e0; display: flex; flex-direction: column; align-items: center; padding-top: 12px; gap: 14px; }
+  .s2c-sidebar-dot { width: 16px; height: 16px; border-radius: 4px; background: #e0e0e0; }
+  .s2c-sidebar-dot.active { background: #1a73e8; }
+  .s2c-main { flex: 1; margin-left: 40px; padding: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
+  .s2c-zero { font-size: 64px; font-weight: 300; color: #dadce0; line-height: 1; }
+  .s2c-label { font-size: 9px; color: #80868b; margin-top: 4px; }
+  .s2c-refresh { position: absolute; top: 12px; right: 12px; font-size: 7px; color: #1a73e8; border: 1px solid #1a73e8; padding: 3px 8px; border-radius: 3px; cursor: pointer; }
+
+  /* Scene 3 — Shift */
+  .s3-screen { background: #060608; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; text-align: center; position: relative; }
+  .s3-screen .eyebrow { font-size: 7px; font-weight: 400; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.20); margin-bottom: 12px; }
+  .s3-screen .shift-text { font-size: 20px; font-weight: 300; color: #fff; line-height: 28px; }
+  .s3-screen .divider { width: 24px; height: 1px; background: rgba(255,255,255,0.06); margin-top: 16px; }
+
+  /* Scene 4 — Builder */
+  .s4-screen { background: #F9FAFB; width: 100%; height: 100%; display: flex; flex-direction: column; overflow: hidden; }
+  .s4-topbar { background: #1B1F3B; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; }
+  .s4-topbar-left { display: flex; align-items: center; gap: 6px; }
+  .s4-logo { font-size: 9px; font-weight: 600; color: rgba(255,255,255,0.85); }
+  .s4-campaign { font-size: 7px; color: rgba(255,255,255,0.40); }
+  .s4-publish { background: #0065F4; color: #fff; font-size: 8px; font-weight: 600; padding: 4px 12px; border-radius: 4px; }
+  .s4-canvas { flex: 1; padding: 8px; display: flex; flex-direction: column; gap: 6px; overflow: hidden; }
+  .s4-block { background: #fff; border: 1px solid #E5E7EB; border-radius: 6px; padding: 10px; }
+  .s4-hero { background: linear-gradient(135deg, #1B1F3B 0%, #2A2F52 100%); border-radius: 6px; padding: 16px 10px; text-align: center; border: none; }
+  .s4-hero-text { font-size: 11px; font-weight: 600; color: #fff; margin-bottom: 4px; }
+  .s4-hero-sub { font-size: 7px; color: rgba(255,255,255,0.50); }
+  .s4-hero-btn { display: inline-block; background: #fff; color: #1B1F3B; font-size: 7px; font-weight: 600; padding: 3px 12px; border-radius: 3px; margin-top: 8px; }
+  .s4-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+  .s4-grid-item { background: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 4px; padding: 8px; text-align: center; }
+  .s4-grid-icon { width: 16px; height: 16px; background: #E5E7EB; border-radius: 4px; margin: 0 auto 4px; }
+  .s4-grid-label { font-size: 7px; color: #6B7280; }
+  .s4-dragging { border: 2px dashed #0065F4; background: rgba(0,101,244,0.04); border-radius: 6px; padding: 10px; display: flex; align-items: center; justify-content: center; min-height: 40px; }
+  .s4-drag-label { font-size: 8px; color: #0065F4; font-weight: 500; }
+  .s4-cursor { position: absolute; bottom: 70px; right: 40px; width: 14px; height: 14px; border-radius: 999px; border: 2px solid #0065F4; background: rgba(0,101,244,0.15); z-index: 5; }
+
+  /* Scene 5 — Analytics */
+  .s5-screen { background: #F9FAFB; width: 100%; height: 100%; display: flex; flex-direction: column; overflow: hidden; }
+  .s5-topbar { background: #1B1F3B; padding: 6px 12px; display: flex; justify-content: space-between; align-items: center; }
+  .s5-topbar .logo { font-size: 9px; font-weight: 600; color: rgba(255,255,255,0.85); }
+  .s5-topbar .site-pick { font-size: 7px; color: rgba(255,255,255,0.40); background: rgba(255,255,255,0.08); padding: 2px 8px; border-radius: 3px; }
+  .s5-kpi-row { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 8px 8px 4px; }
+  .s5-kpi { background: #fff; border: 1px solid #E5E7EB; border-radius: 6px; padding: 8px; }
+  .s5-kpi-label { font-size: 7px; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.5px; }
+  .s5-kpi-value { font-size: 16px; font-weight: 600; color: #111827; margin-top: 2px; }
+  .s5-kpi-delta { font-size: 7px; font-weight: 600; margin-top: 2px; }
+  .s5-kpi-delta.up { color: #10B981; }
+  .s5-kpi-delta.down { color: #EF4444; }
+  .s5-chart { flex: 1; margin: 4px 8px 8px; background: #fff; border: 1px solid #E5E7EB; border-radius: 6px; padding: 10px; position: relative; display: flex; flex-direction: column; }
+  .s5-chart-title { font-size: 8px; font-weight: 600; color: #111827; margin-bottom: 8px; }
+  .s5-chart-area { flex: 1; position: relative; overflow: hidden; }
+  .s5-line { position: absolute; bottom: 0; left: 0; right: 0; height: 100%; }
+  .s5-annotation { position: absolute; top: 8px; right: 8px; background: #111827; color: #fff; font-size: 7px; font-weight: 500; padding: 4px 8px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.06); }
+
+  /* Scene 6 — Drill down */
+  .s6-screen { background: #F9FAFB; width: 100%; height: 100%; display: flex; flex-direction: column; overflow: hidden; }
+  .s6-topbar { background: #1B1F3B; padding: 6px 12px; }
+  .s6-topbar .logo { font-size: 9px; font-weight: 600; color: rgba(255,255,255,0.85); }
+  .s6-main { flex: 1; display: flex; overflow: hidden; }
+  .s6-chart-side { width: 45%; padding: 8px; display: flex; flex-direction: column; }
+  .s6-mini-chart { flex: 1; background: #fff; border: 1px solid #E5E7EB; border-radius: 6px; padding: 8px; position: relative; }
+  .s6-mini-title { font-size: 7px; font-weight: 600; color: #111827; margin-bottom: 4px; }
+  .s6-click-dot { position: absolute; top: 45%; left: 55%; width: 12px; height: 12px; border-radius: 999px; border: 2px solid #0065F4; background: rgba(0,101,244,0.20); }
+  .s6-panel { width: 55%; background: #fff; border-left: 1px solid #E5E7EB; padding: 12px; display: flex; flex-direction: column; gap: 8px; overflow: hidden; }
+  .s6-panel-header { font-size: 9px; font-weight: 600; color: #111827; padding-bottom: 6px; border-bottom: 1px solid #F3F4F6; }
+  .s6-panel-label { font-size: 7px; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+  .s6-breakdown { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; }
+  .s6-break-row { display: flex; align-items: center; gap: 6px; }
+  .s6-break-name { font-size: 8px; color: #374151; min-width: 44px; }
+  .s6-break-bar-wrap { flex: 1; height: 8px; background: #F3F4F6; border-radius: 4px; overflow: hidden; }
+  .s6-break-bar { height: 100%; border-radius: 4px; }
+  .s6-break-pct { font-size: 8px; font-weight: 600; color: #111827; min-width: 28px; text-align: right; }
+  .s6-level { font-size: 7px; color: #0065F4; font-weight: 500; margin-top: 8px; display: flex; gap: 4px; }
+  .s6-level span { background: #EFF6FF; padding: 2px 6px; border-radius: 3px; }
+  .s6-level span.active { background: #0065F4; color: #fff; }
+
+  /* Scene 7 — Compare */
+  .s7-screen { background: #F9FAFB; width: 100%; height: 100%; display: flex; flex-direction: column; overflow: hidden; }
+  .s7-topbar { background: #1B1F3B; padding: 6px 12px; display: flex; justify-content: space-between; align-items: center; }
+  .s7-topbar .logo { font-size: 9px; font-weight: 600; color: rgba(255,255,255,0.85); }
+  .s7-compare-toggle { display: flex; align-items: center; gap: 4px; }
+  .s7-toggle-label { font-size: 7px; color: rgba(255,255,255,0.40); }
+  .s7-toggle { width: 22px; height: 12px; background: #0065F4; border-radius: 6px; position: relative; }
+  .s7-toggle-dot { width: 8px; height: 8px; background: #fff; border-radius: 999px; position: absolute; top: 2px; right: 2px; }
+  .s7-kpis { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 8px 8px 4px; }
+  .s7-kpi { background: #fff; border: 1px solid #E5E7EB; border-radius: 6px; padding: 6px 8px; }
+  .s7-kpi-label { font-size: 6px; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.5px; }
+  .s7-kpi-val { font-size: 14px; font-weight: 600; color: #111827; }
+  .s7-kpi-delta { font-size: 7px; font-weight: 600; }
+  .s7-chart-area { flex: 1; margin: 4px 8px; background: #fff; border: 1px solid #E5E7EB; border-radius: 6px; padding: 10px; position: relative; }
+  .s7-chart-label { font-size: 7px; font-weight: 600; color: #111827; margin-bottom: 6px; }
+  .s7-export-area { margin: 0 8px 8px; }
+  .s7-export-modal { background: #fff; border: 1px solid #E5E7EB; border-radius: 8px; padding: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+  .s7-export-title { font-size: 9px; font-weight: 600; color: #111827; margin-bottom: 6px; }
+  .s7-export-options { display: flex; gap: 4px; margin-bottom: 6px; }
+  .s7-export-opt { font-size: 7px; padding: 3px 8px; border-radius: 4px; background: #F3F4F6; color: #6B7280; }
+  .s7-export-opt.selected { background: #0065F4; color: #fff; }
+  .s7-export-thumb { background: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 4px; height: 40px; display: flex; align-items: center; justify-content: center; }
+  .s7-export-thumb-text { font-size: 7px; color: #9CA3AF; }
+  .s7-export-btn { background: #0065F4; color: #fff; font-size: 8px; font-weight: 600; padding: 5px 16px; border-radius: 4px; text-align: center; margin-top: 6px; }
+
+  /* Scene 8 — Loop */
+  .s8-screen { width: 100%; height: 100%; position: relative; overflow: hidden; }
+  .s8-bg { position: absolute; inset: 0; background: #F9FAFB; filter: blur(3px); opacity: 0.4; }
+  .s8-overlay { position: absolute; inset: 0; background: rgba(6,6,8,0.82); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 24px; }
+  .s8-loop { font-size: 20px; font-weight: 300; color: #fff; }
+  .s8-loop-arrow { color: rgba(255,255,255,0.15); }
+  .s8-sub { font-size: 12px; font-weight: 300; font-style: italic; color: rgba(255,255,255,0.20); margin-top: 16px; }
+
+  /* Scene 9 — CTA */
+  .s9-screen { background: #060608; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 24px; position: relative; }
+  .s9-mark { font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.85); margin-bottom: 20px; }
+  .s9-tag { font-size: 17px; font-weight: 300; color: #fff; line-height: 24px; }
+  .s9-divider { width: 28px; height: 1px; background: rgba(255,255,255,0.08); margin: 14px 0; }
+  .s9-url { font-size: 11px; font-weight: 400; color: rgba(255,255,255,0.40); }
+
+  /* SVG chart helpers */
+  .chart-svg { width: 100%; height: 100%; }
+
+  .footer { background: #060608; padding: 28px 48px; text-align: center; margin-top: 40px; }
+  .footer p { font-size: 11px; color: rgba(255,255,255,0.15); }
+
+  @media (max-width: 860px) {
+    .scene-row, .scene-row.reverse { flex-direction: column; align-items: center; }
+    .scene-info { padding-top: 24px; }
+    .container { padding: 0 24px; }
+    .hero { padding: 48px 24px 36px; }
+    .hero h1 { font-size: 28px; line-height: 38px; }
+    .nav { padding: 14px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <div class="nav-logo">Havola</div>
+  <div class="nav-badge">Storyboard v2</div>
+</div>
+
+<div class="hero">
+  <div class="hero-eyebrow">Visual Storyboard · 9 Scenes · 48 Seconds</div>
+  <h1>You built the page.<br><em>The dashboard was already there.</em></h1>
+  <p>Each frame below shows exactly what the viewer sees on their phone.</p>
+</div>
+
+<div class="container">
+
+  <!-- ==================== SCENE 1 ==================== -->
+  <div class="scene-row">
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="s1-screen">
+          <div class="accent-line"></div>
+          <div class="h-line1">You built the page.</div>
+          <div class="h-line2">The dashboard was already there.</div>
+          <div class="watermark">Havola</div>
+        </div>
+      </div>
+    </div>
+    <div class="scene-info">
+      <div class="scene-num-label">
+        <div class="scene-num-circle">1</div>
+        <span class="scene-type-tag t-text">Text</span>
+        <span class="scene-time">0:00–0:03</span>
+      </div>
+      <div class="scene-title">Hook</div>
+      <div class="scene-desc">The scroll-stopper. One claim that sounds impossible — dashboards don't build themselves. Text is already on screen when the frame appears. No fade-in, no animation. Forces immediate reading. The viewer stays to see if it's true.</div>
+      <div class="vo-label">Voiceover</div>
+      <div class="vo-box">"You built the page. The dashboard was already there."</div>
+    </div>
+  </div>
+
+  <!-- ==================== SCENE 2 — GTM ==================== -->
+  <div class="scene-row reverse">
+    <div class="phone-wrap">
+      <div class="phone" style="position:relative;">
+        <div class="phone-notch"></div>
+        <div class="s2-screen">
+          <div class="s2-toolbar">Google Tag Manager <span>Container: GTM-XXXXXX</span></div>
+          <div class="s2-tabs">
+            <div class="s2-tab active">Tags</div>
+            <div class="s2-tab">Triggers</div>
+            <div class="s2-tab">Variables</div>
+          </div>
+          <div class="s2-table">
+            <div class="s2-row"><span class="name">GA4 – Page View</span><span class="type">GA4 Event</span></div>
+            <div class="s2-row"><span class="name">GA4 – Form Submit</span><span class="type">GA4 Event</span></div>
+            <div class="s2-row"><span class="name">GA4 – CTA Click</span><span class="type">GA4 Event</span></div>
+            <div class="s2-row"><span class="name">FB – PageView</span><span class="type">Custom HTML</span></div>
+            <div class="s2-row"><span class="name">FB – Lead</span><span class="type">Custom HTML</span></div>
+            <div class="s2-row"><span class="name">LinkedIn – Conv</span><span class="type">Custom HTML</span></div>
+            <div class="s2-row"><span class="name">GA4 – Scroll Depth</span><span class="type">GA4 Event</span></div>
+            <div class="s2-row"><span class="name">Hotjar – Init</span><span class="type">Custom HTML</span></div>
+            <div class="s2-row"><span class="name">GA4 – Video Play</span><span class="type">GA4 Event</span></div>
+            <div class="s2-row"><span class="name">TikTok – View</span><span class="type">Custom HTML</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="scene-info">
+      <div class="scene-num-label">
+        <div class="scene-num-circle">2</div>
+        <span class="scene-type-tag t-screen">Screen rec</span>
+        <span class="scene-time">0:03–0:10</span>
+      </div>
+      <div class="scene-title">The painful workflow everyone recognises</div>
+      <div class="scene-desc">NOT text cards. Rapid screen recordings of real tools: <strong>Google Tag Manager</strong> (dense, technical, intimidating), a <strong>UTM builder</strong> (tedious form fields), and <strong>GA4 real-time showing 0 users</strong> (the worst feeling). Fast cuts, 1.5–2 seconds each. Every agency person recognises these screens instantly.</div>
+      <div class="scene-desc">The frames on the left show the three cuts. The pace is slightly uncomfortable — it says "this is a chore."</div>
+      <div class="vo-label">Voiceover</div>
+      <div class="vo-box">"Build the page. Set up Tag Manager. Configure UTMs. Check if the data's flowing. Refresh. Refresh again."</div>
+    </div>
+  </div>
+
+  <!-- ==================== SCENE 2b — UTM (additional frame) ==================== -->
+  <div class="scene-row">
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="s2b-screen">
+          <div class="s2b-title">UTM Campaign Builder</div>
+          <div class="s2b-field">
+            <div class="s2b-label">Website URL</div>
+            <div class="s2b-input">https://hav.la/summer-sale-2026</div>
+          </div>
+          <div class="s2b-field">
+            <div class="s2b-label">Campaign Source</div>
+            <div class="s2b-input">linkedin</div>
+          </div>
+          <div class="s2b-field">
+            <div class="s2b-label">Campaign Medium</div>
+            <div class="s2b-input">paid_social</div>
+          </div>
+          <div class="s2b-field">
+            <div class="s2b-label">Campaign Name</div>
+            <div class="s2b-input">summer_sale_2026</div>
+          </div>
+          <div class="s2b-field">
+            <div class="s2b-label">Campaign Content</div>
+            <div class="s2b-input">hero_banner_v2</div>
+          </div>
+          <div class="s2b-result">https://hav.la/summer-sale-2026?utm_source=linkedin&amp;utm_medium=paid_social&amp;utm_campaign=summer_sale_2026&amp;utm_content=hero_banner_v2</div>
+        </div>
+      </div>
+    </div>
+    <div class="scene-info">
+      <div class="scene-num-label">
+        <div class="scene-num-circle" style="background:#9CA3AF;">2b</div>
+        <span class="scene-type-tag t-screen">Screen rec</span>
+        <span class="scene-time">Cut 2 of 3</span>
+      </div>
+      <div class="scene-title">UTM Builder — the tedious form</div>
+      <div class="scene-desc">Someone filling in source, medium, campaign, content fields one by one. The generated URL at the bottom is a mess of parameters. Tedious. Repetitive. Error-prone. Everyone's done this hundreds of times.</div>
+    </div>
+  </div>
+
+  <!-- ==================== SCENE 2c — GA4 Zero ==================== -->
+  <div class="scene-row reverse">
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="s2c-screen">
+          <div class="s2c-nav">
+            <div class="s2c-nav-icon"></div>
+            <div class="s2c-nav-text">Analytics</div>
+          </div>
+          <div class="s2c-sidebar">
+            <div class="s2c-sidebar-dot"></div>
+            <div class="s2c-sidebar-dot active"></div>
+            <div class="s2c-sidebar-dot"></div>
+            <div class="s2c-sidebar-dot"></div>
+            <div class="s2c-sidebar-dot"></div>
+          </div>
+          <div class="s2c-main">
+            <div class="s2c-refresh">↻ Refresh</div>
+            <div class="s2c-zero">0</div>
+            <div class="s2c-label">Active users right now</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="scene-info">
+      <div class="scene-num-label">
+        <div class="scene-num-circle" style="background:#9CA3AF;">2c</div>
+        <span class="scene-type-tag t-screen">Screen rec</span>
+        <span class="scene-time">Cut 3 of 3</span>
+      </div>
+      <div class="scene-title">GA4 real-time — zero active users</div>
+      <div class="scene-desc">The emotional low point. The big zero. The cursor clicks refresh. Still zero. <strong>"Is the data flowing?"</strong> — the question every agency person has asked themselves at 4pm on a Friday.</div>
+    </div>
+  </div>
+
+  <!-- ==================== SCENE 3 ==================== -->
+  <div class="scene-row">
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="s3-screen">
+          <div class="eyebrow">Campaign Intelligence</div>
+          <div class="shift-text">What if you never had to<br>do any of that?</div>
+          <div class="divider"></div>
+        </div>
+      </div>
+    </div>
+    <div class="scene-info">
+      <div class="scene-num-label">
+        <div class="scene-num-circle">3</div>
+        <span class="scene-type-tag t-text">Text</span>
+        <span class="scene-time">0:10–0:13</span>
+      </div>
+      <div class="scene-title">The shift</div>
+      <div class="scene-desc">The pivot. One question the viewer can't dismiss. Holds just long enough to read, then cuts directly into the product. Doesn't say "we're better" — asks a question.</div>
+      <div class="vo-label">Voiceover</div>
+      <div class="vo-box">"What if you never had to do any of that?"</div>
+    </div>
+  </div>
+
+  <!-- ==================== SCENE 4 ==================== -->
+  <div class="scene-row reverse">
+    <div class="phone-wrap">
+      <div class="phone" style="position:relative;">
+        <div class="phone-notch"></div>
+        <div class="s4-screen">
+          <div class="s4-topbar">
+            <div class="s4-topbar-left">
+              <div class="s4-logo">Havola</div>
+              <div class="s4-campaign">Summer Sale 2026</div>
+            </div>
+            <div class="s4-publish">Publish</div>
+          </div>
+          <div class="s4-canvas">
+            <div class="s4-hero">
+              <div class="s4-hero-text">Summer Sale 2026</div>
+              <div class="s4-hero-sub">Up to 40% off across all collections</div>
+              <div class="s4-hero-btn">Shop Now</div>
+            </div>
+            <div class="s4-block">
+              <div class="s4-grid">
+                <div class="s4-grid-item"><div class="s4-grid-icon"></div><div class="s4-grid-label">Free Delivery</div></div>
+                <div class="s4-grid-item"><div class="s4-grid-icon"></div><div class="s4-grid-label">Easy Returns</div></div>
+                <div class="s4-grid-item"><div class="s4-grid-icon"></div><div class="s4-grid-label">Members First</div></div>
+                <div class="s4-grid-item"><div class="s4-grid-icon"></div><div class="s4-grid-label">Gift Wrapping</div></div>
+              </div>
+            </div>
+            <div class="s4-dragging">
+              <div class="s4-drag-label">↕ Dragging: CTA Section</div>
+            </div>
+          </div>
+        </div>
+        <div class="s4-cursor"></div>
+      </div>
+    </div>
+    <div class="scene-info">
+      <div class="scene-num-label">
+        <div class="scene-num-circle">4</div>
+        <span class="scene-type-tag t-screen">Screen rec</span>
+        <span class="scene-time">0:13–0:20</span>
+      </div>
+      <div class="scene-title">Building the campaign page on Havola</div>
+      <div class="scene-desc">The product takes over. Havola Campaign Sites builder — page nearly complete. The cursor drags one final section into place, then clicks <strong>Publish</strong>. The site goes live. The energy is the opposite of Scene 2: smooth, fast, satisfying. One drag. One click. Live.</div>
+      <div class="vo-label">Voiceover</div>
+      <div class="vo-box">"Build your campaign page on Havola. Drag the sections. Hit publish. You're live."</div>
+    </div>
+  </div>
+
+  <!-- ==================== SCENE 5 — KEY ==================== -->
+  <div class="scene-row">
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="s5-screen">
+          <div class="s5-topbar">
+            <div class="logo">Havola</div>
+            <div class="site-pick">Summer Sale 2026 ▾</div>
+          </div>
+          <div class="s5-kpi-row">
+            <div class="s5-kpi">
+              <div class="s5-kpi-label">Visits</div>
+              <div class="s5-kpi-value">1,247</div>
+              <div class="s5-kpi-delta up">↑ 18%</div>
+            </div>
+            <div class="s5-kpi">
+              <div class="s5-kpi-label">Unique Visitors</div>
+              <div class="s5-kpi-value">843</div>
+              <div class="s5-kpi-delta up">↑ 12%</div>
+            </div>
+            <div class="s5-kpi">
+              <div class="s5-kpi-label">Form Submissions</div>
+              <div class="s5-kpi-value">38</div>
+              <div class="s5-kpi-delta down">↓ 3%</div>
+            </div>
+            <div class="s5-kpi">
+              <div class="s5-kpi-label">Avg Session</div>
+              <div class="s5-kpi-value">2m 14s</div>
+              <div class="s5-kpi-delta up">↑ 42%</div>
+            </div>
+          </div>
+          <div class="s5-chart">
+            <div class="s5-chart-title">Visits · Last 7 Days</div>
+            <div class="s5-chart-area">
+              <svg class="chart-svg" viewBox="0 0 240 100" preserveAspectRatio="none">
+                <polyline points="0,70 35,55 70,60 105,40 140,35 175,25 210,30 240,15" fill="none" stroke="#0065F4" stroke-width="2"/>
+                <polyline points="0,70 35,55 70,60 105,40 140,35 175,25 210,30 240,15" fill="url(#grad)" stroke="none"/>
+                <defs><linearGradient id="grad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0065F4" stop-opacity="0.12"/><stop offset="100%" stop-color="#0065F4" stop-opacity="0"/></linearGradient></defs>
+              </svg>
+            </div>
+            <div class="s5-annotation">No setup. Already tracking.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="scene-info">
+      <div class="scene-num-label">
+        <div class="scene-num-circle key">5</div>
+        <span class="scene-type-tag t-screen">Screen rec</span>
+        <span class="scene-time">0:20–0:26</span>
+      </div>
+      <div class="scene-title">The data is already there ⭐</div>
+      <div class="key-box">This is the most important cut in the entire video. Hard cut from the publish confirmation directly to live analytics. No transition. No black frame. No configuration scene. The gap from Scene 2 simply doesn't exist. The missing scene IS the message. No competitor can make this cut.</div>
+      <div class="scene-desc">KPIs show real, modest numbers. Line chart shows 7 days of traffic. A mix of green and red deltas — honest and realistic. The annotation reinforces: "No setup. Already tracking."</div>
+      <div class="vo-label">Voiceover</div>
+      <div class="vo-box">"The moment you publish, your analytics are live. No Tag Manager. No UTMs. Nothing to configure. Havola built the page and the tracking — so the data's already flowing."</div>
+    </div>
+  </div>
+
+  <!-- ==================== SCENE 6 ==================== -->
+  <div class="scene-row reverse">
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="s6-screen">
+          <div class="s6-topbar"><div class="logo" style="font-size:9px;font-weight:600;color:rgba(255,255,255,0.85);">Havola</div></div>
+          <div class="s6-main">
+            <div class="s6-chart-side">
+              <div class="s6-mini-chart">
+                <div class="s6-mini-title">Visits</div>
+                <svg viewBox="0 0 100 50" style="width:100%;height:60px;" preserveAspectRatio="none">
+                  <polyline points="0,35 15,28 30,30 45,20 60,18 75,12 90,16 100,8" fill="none" stroke="#0065F4" stroke-width="1.5" opacity="0.4"/>
+                </svg>
+                <div class="s6-click-dot"></div>
+              </div>
+            </div>
+            <div class="s6-panel">
+              <div class="s6-panel-header">InsightPanel</div>
+              <div class="s6-level">
+                <span>L1</span>
+                <span class="active">L2</span>
+                <span>L3</span>
+                <span>L4</span>
+                <span>L5</span>
+              </div>
+              <div class="s6-panel-label">Device Breakdown</div>
+              <div class="s6-breakdown">
+                <div class="s6-break-row">
+                  <div class="s6-break-name">Desktop</div>
+                  <div class="s6-break-bar-wrap"><div class="s6-break-bar" style="width:62%;background:#0065F4;"></div></div>
+                  <div class="s6-break-pct">62%</div>
+                </div>
+                <div class="s6-break-row">
+                  <div class="s6-break-name">Mobile</div>
+                  <div class="s6-break-bar-wrap"><div class="s6-break-bar" style="width:34%;background:#14B8A6;"></div></div>
+                  <div class="s6-break-pct">34%</div>
+                </div>
+                <div class="s6-break-row">
+                  <div class="s6-break-name">Tablet</div>
+                  <div class="s6-break-bar-wrap"><div class="s6-break-bar" style="width:4%;background:#FAAD14;"></div></div>
+                  <div class="s6-break-pct">4%</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="scene-info">
+      <div class="scene-num-label">
+        <div class="scene-num-circle">6</div>
+        <span class="scene-type-tag t-screen">Screen rec</span>
+        <span class="scene-time">0:26–0:33</span>
+      </div>
+      <div class="scene-title">Drilling into the data</div>
+      <div class="scene-desc">Click a data point on the chart → InsightPanel slides open showing L1 summary → click deeper to L2 device breakdown. Desktop 62%, Mobile 34%, Tablet 4%. Two clicks, real intelligence. <strong>Don't show all five levels — the VO says "five," the visual proves two. Leaves the viewer wanting to try it.</strong></div>
+      <div class="vo-label">Voiceover</div>
+      <div class="vo-box">"Click any chart. Drill down five levels deep. From the number, to the device, to the page, to the trend, to the recommendation."</div>
+    </div>
+  </div>
+
+  <!-- ==================== SCENE 7 ==================== -->
+  <div class="scene-row">
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="s7-screen">
+          <div class="s7-topbar">
+            <div class="logo" style="font-size:9px;font-weight:600;color:rgba(255,255,255,0.85);">Havola</div>
+            <div class="s7-compare-toggle">
+              <div class="s7-toggle-label">Compare</div>
+              <div class="s7-toggle"><div class="s7-toggle-dot"></div></div>
+            </div>
+          </div>
+          <div class="s7-kpis">
+            <div class="s7-kpi"><div class="s7-kpi-label">Visits</div><div class="s7-kpi-val">1,247</div><div class="s7-kpi-delta" style="color:#10B981;">↑ 18%</div></div>
+            <div class="s7-kpi"><div class="s7-kpi-label">Unique</div><div class="s7-kpi-val">843</div><div class="s7-kpi-delta" style="color:#10B981;">↑ 12%</div></div>
+            <div class="s7-kpi"><div class="s7-kpi-label">Forms</div><div class="s7-kpi-val">38</div><div class="s7-kpi-delta" style="color:#EF4444;">↓ 3%</div></div>
+            <div class="s7-kpi"><div class="s7-kpi-label">Avg Sess.</div><div class="s7-kpi-val">2:14</div><div class="s7-kpi-delta" style="color:#10B981;">↑ 42%</div></div>
+          </div>
+          <div class="s7-chart-area">
+            <div class="s7-chart-label">Visits · Compare ON</div>
+            <svg viewBox="0 0 240 80" style="width:100%;height:60px;" preserveAspectRatio="none">
+              <polyline points="0,55 35,45 70,48 105,32 140,28 175,20 210,24 240,12" fill="none" stroke="#0065F4" stroke-width="2"/>
+              <polyline points="0,60 35,58 70,52 105,50 140,45 175,42 210,40 240,38" fill="none" stroke="#0065F4" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.3"/>
+            </svg>
+          </div>
+          <div class="s7-export-area">
+            <div class="s7-export-modal">
+              <div class="s7-export-title">Export Module</div>
+              <div class="s7-export-options">
+                <div class="s7-export-opt selected">PDF</div>
+                <div class="s7-export-opt">PNG</div>
+                <div class="s7-export-opt">JPEG</div>
+              </div>
+              <div class="s7-export-thumb"><div class="s7-export-thumb-text">9-section insights report</div></div>
+              <div class="s7-export-btn">Export</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="scene-info">
+      <div class="scene-num-label">
+        <div class="scene-num-circle">7</div>
+        <span class="scene-type-tag t-screen">Screen rec</span>
+        <span class="scene-time">0:33–0:40</span>
+      </div>
+      <div class="scene-title">Comparison and client report</div>
+      <div class="scene-desc">Toggle Compare ON → dotted previous period overlay on chart → KPI cards update with coloured deltas (mix of green and red — realistic). Then click export → modal shows PDF selected → thumbnail of the insights report → click Export. <strong>Two features, one click each. Data to client inbox in seconds.</strong></div>
+      <div class="vo-label">Voiceover</div>
+      <div class="vo-box">"Compare any period with one toggle. See what went up and what went down. Then export a full insights report for your client — ready in seconds."</div>
+    </div>
+  </div>
+
+  <!-- ==================== SCENE 8 ==================== -->
+  <div class="scene-row reverse">
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="s8-screen">
+          <div class="s8-bg"></div>
+          <div class="s8-overlay">
+            <div class="s8-loop">Build <span class="s8-loop-arrow">&ensp;→&ensp;</span> Track <span class="s8-loop-arrow">&ensp;→&ensp;</span> Understand</div>
+            <div class="s8-sub">No configuration step.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="scene-info">
+      <div class="scene-num-label">
+        <div class="scene-num-circle">8</div>
+        <span class="scene-type-tag t-overlay">Text over product</span>
+        <span class="scene-time">0:40–0:44</span>
+      </div>
+      <div class="scene-title">The loop</div>
+      <div class="scene-desc">Semi-transparent dark overlay fades over the dashboard (still visible, slightly blurred underneath). Three words appear in sequence: <strong>Build → Track → Understand.</strong> Then the italic subline: <em>No configuration step.</em> This is the frame that lives in the viewer's memory. The product behind the text is a subtle reminder — everything was real, inside one platform.</div>
+      <div class="vo-label">Voiceover</div>
+      <div class="vo-box">"Build. Track. Understand. No configuration step."</div>
+    </div>
+  </div>
+
+  <!-- ==================== SCENE 9 ==================== -->
+  <div class="scene-row">
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="s9-screen">
+          <div class="s9-mark">Havola</div>
+          <div class="s9-tag">Campaign intelligence,<br>unified.</div>
+          <div class="s9-divider"></div>
+          <div class="s9-url">havola.co.uk</div>
+        </div>
+      </div>
+    </div>
+    <div class="scene-info">
+      <div class="scene-num-label">
+        <div class="scene-num-circle">9</div>
+        <span class="scene-type-tag t-brand">Brand</span>
+        <span class="scene-time">0:44–0:48</span>
+      </div>
+      <div class="scene-title">CTA</div>
+      <div class="scene-desc">Clean close. Havola wordmark fades in, then tagline, then URL. Music swells slightly. Hold two seconds. End. No hard sell. The confidence of the ending matches the brand — calm, assured, premium.</div>
+      <div class="vo-label">Voiceover</div>
+      <div class="vo-box">"Havola. Campaign intelligence, unified."</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  <p>Havola · Video Storyboard v2 · Campaign Analytics: Zero-Config Intelligence · Internal</p>
+</div>
+
+</body>
+</html>
